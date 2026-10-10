@@ -46,14 +46,14 @@ jobs:
         run: |
           echo "=========================================="
           echo "LARP Pure Native Android CI/CD Pipeline"
-          echo "App: API Test (com.larp.api_test)"
+          echo "App: Api Test (com.larp.apitest)"
           echo "Target SDK: 34 (Android 14+ Ready)"
           echo "=========================================="
 
           WORK_DIR="build_workspace"
           GEN_DIR="$WORK_DIR/gen"
           BIN_DIR="$WORK_DIR/bin"
-          SRC_DIR="$WORK_DIR/src/com/larp/api_test"
+          SRC_DIR="$WORK_DIR/src/com/larp/apitest"
           RES_DIR="$WORK_DIR/res"
           DRAWABLE_DIR="$RES_DIR/drawable"
           VALUES_DIR="$RES_DIR/values"
@@ -62,7 +62,7 @@ jobs:
           mkdir -p "$GEN_DIR" "$BIN_DIR" "$SRC_DIR" "$DRAWABLE_DIR" "$VALUES_DIR" "$ASSETS_DIR/public"
 
           # 0. Materialize every uploaded launcher icon sent in iconVariants.
-          echo "No uploaded image for default; generated fallback remains disabled until an image is supplied."
+          
 
           # 1. Copy web static files to assets/public
           if [ -d "public" ]; then
@@ -74,18 +74,18 @@ jobs:
 
           # 2. Write Android resources (strings.xml, colors.xml, styles.xml)
           cat << 'EOF' > "$VALUES_DIR/strings.xml"
-          <resources><string name="app_name">API Test</string></resources>
+          <resources><string name="app_name">Api Test</string></resources>
           EOF
 
           cat << 'EOF' > "$VALUES_DIR/colors.xml"
-          <resources><color name="colorPrimary">#111827</color></resources>
+          <resources><color name="colorPrimary">#336699</color></resources>
           EOF
 
           cat << 'EOF' > "$VALUES_DIR/styles.xml"
           <resources>
               <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:statusBarColor">#111827</item>
-                  <item name="android:navigationBarColor">#111827</item>
+                  <item name="android:statusBarColor">#336699</item>
+                  <item name="android:navigationBarColor">#336699</item>
                   <item name="android:windowDrawsSystemBarBackgrounds">true</item>
               </style>
           </resources>
@@ -95,7 +95,7 @@ jobs:
           cat << 'EOF' > "$WORK_DIR/AndroidManifest.xml"
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-              package="com.larp.api_test"
+              package="com.larp.apitest"
               android:versionCode="1"
               android:versionName="1.0.0">
 
@@ -119,15 +119,15 @@ jobs:
               
 
               <application
-                  android:label="API Test"
+                  android:label="Api Test"
                   android:theme="@style/AppTheme"
                   android:hardwareAccelerated="true"
                   android:allowBackup="true"
                   android:icon="@drawable/ic_launcher_default">
 
                   <activity
-                      android:name="com.larp.api_test.MainActivity"
-                      android:label="API Test"
+                      android:name="com.larp.apitest.MainActivity"
+                      android:label="Api Test"
                       android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
                       android:exported="true"
                       android:launchMode="singleTask">
@@ -137,9 +137,9 @@ jobs:
                   </activity>
 
                   <activity-alias
-                      android:name="com.larp.api_test.MainActivity_default"
-                      android:targetActivity="com.larp.api_test.MainActivity"
-                      android:label="API Test"
+                      android:name="com.larp.apitest.MainActivity_default"
+                      android:targetActivity="com.larp.apitest.MainActivity"
+                      android:label="Api Test"
                       android:enabled="true"
                       android:exported="true">
                       <intent-filter>
@@ -154,7 +154,7 @@ jobs:
 
           # 4. Write MainActivity.java
           cat << 'EOF' > "$SRC_DIR/MainActivity.java"
-          package com.larp.api_test;
+          package com.larp.apitest;
           import android.app.Activity;
           import android.os.Build;
           import android.os.Bundle;
@@ -179,7 +179,7 @@ jobs:
               private WebView webView;
               private View splashView;
               private Handler mainHandler;
-              private static final String DEFAULT_THEME_COLOR = "#111827";
+              private static final String DEFAULT_THEME_COLOR = "#336699";
 
               @Override
               protected void onCreate(Bundle savedInstanceState) {
@@ -300,26 +300,40 @@ jobs:
           }
           EOF
 
-          # 5. Compile R.java & APK using aapt, javac, dx, zipalign, apksigner
-          ANDROID_JAR="/usr/lib/android-sdk/platforms/android-23/android.jar"
-          if [ ! -f "$ANDROID_JAR" ]; then
-            ANDROID_JAR=$(find /usr -name "android.jar" 2>/dev/null | head -n 1)
-          fi
+          # 5. Compile R.java & APK using the tools installed by setup-android.
+          # Never assume /usr/lib/android-sdk or the removed legacy dx command exists.
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/.android/sdk}}"
+          BUILD_TOOLS_DIR="$SDK_ROOT/build-tools/34.0.0"
+          PLATFORM_DIR="$SDK_ROOT/platforms/android-34"
+          AAPT="$BUILD_TOOLS_DIR/aapt"
+          D8="$BUILD_TOOLS_DIR/d8"
+          ZIPALIGN="$BUILD_TOOLS_DIR/zipalign"
+          APKSIGNER="$BUILD_TOOLS_DIR/apksigner"
+          ANDROID_JAR="$PLATFORM_DIR/android.jar"
 
-          echo "Using android.jar: $ANDROID_JAR"
+          for tool in "$AAPT" "$D8" "$ZIPALIGN" "$APKSIGNER" "$ANDROID_JAR"; do
+            if [ ! -e "$tool" ]; then
+              echo "Missing Android build tool: $tool"
+              exit 1
+            fi
+          done
 
-          aapt package -m -J "$GEN_DIR" -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34
-          javac -cp "$ANDROID_JAR" -d "$BIN_DIR" -source 8 -target 8 "$GEN_DIR/com/larp/api_test/R.java" "$SRC_DIR/MainActivity.java"
-          dx --dex --output="$WORK_DIR/classes.dex" "$BIN_DIR"
+          echo "Using Android SDK: $SDK_ROOT"
+          echo "Using build tools: $BUILD_TOOLS_DIR"
 
-          aapt package -f -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -A "$ASSETS_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34 -F "$WORK_DIR/unsigned.apk"
-          (cd "$WORK_DIR" && aapt add unsigned.apk classes.dex)
+          "$AAPT" package -m -J "$GEN_DIR" -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34
+          javac -cp "$ANDROID_JAR" -d "$BIN_DIR" -source 8 -target 8 "$GEN_DIR/com/larp/apitest/R.java" "$SRC_DIR/MainActivity.java"
+          "$D8" --min-api 21 --output "$WORK_DIR/dex" "$BIN_DIR"
+          cp "$WORK_DIR/dex/classes.dex" "$WORK_DIR/classes.dex"
 
-          zipalign -f -p 4 "$WORK_DIR/unsigned.apk" "$WORK_DIR/aligned.apk"
+          "$AAPT" package -f -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -A "$ASSETS_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34 -F "$WORK_DIR/unsigned.apk"
+          (cd "$WORK_DIR" && "$AAPT" add unsigned.apk classes.dex)
 
-          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=API Test, OU=LARP, O=LARP Engineering, C=US"
+          "$ZIPALIGN" -f -p 4 "$WORK_DIR/unsigned.apk" "$WORK_DIR/aligned.apk"
 
-          apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --ks release.keystore --ks-pass pass:larp_keystore_password_2026 --ks-key-alias larp_release --out signed_release.apk "$WORK_DIR/aligned.apk"
+          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=Api Test, OU=LARP, O=LARP Engineering, C=US"
+
+          "$APKSIGNER" sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --ks release.keystore --ks-pass pass:larp_keystore_password_2026 --ks-key-alias larp_release --out signed_release.apk "$WORK_DIR/aligned.apk"
 
           mkdir -p build_output
           cp signed_release.apk build_output/api_test_signed_release.apk
@@ -329,7 +343,7 @@ jobs:
           cp -r "$WORK_DIR/assets" build_output/assets
           cp -r "$WORK_DIR/res" build_output/res
           printf '%s
-' '{"appName":"API Test","appId":"com.larp.api_test","version":"1.0.0","versionCode":1}' > build_output/build-metadata.json
+' '{"appName":"Api Test","appId":"com.larp.apitest","version":"1.0.0","versionCode":1}' > build_output/build-metadata.json
           (cd build_output && zip -r "api_test_github_complete.zip" .)
 
           echo "Build artifacts generated successfully!"
