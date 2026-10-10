@@ -342,8 +342,7 @@ jobs:
           cp -r "$WORK_DIR/src" build_output/source
           cp -r "$WORK_DIR/assets" build_output/assets
           cp -r "$WORK_DIR/res" build_output/res
-          printf '%s
-' '{"appName":"Api Test","appId":"com.larp.apitest","version":"1.0.0","versionCode":1}' > build_output/build-metadata.json
+          printf '%s\n' '{"appName":"Api Test","appId":"com.larp.apitest","version":"1.0.0","versionCode":1}' > build_output/build-metadata.json
           (cd build_output && zip -r "api_test_github_complete.zip" .)
 
           echo "Build artifacts generated successfully!"
