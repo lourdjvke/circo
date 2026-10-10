@@ -349,9 +349,9 @@ jobs:
           echo "Build artifacts generated successfully!"
           ls -lh build_output/
 
-          - name: Upload Complete Build Artifacts
-            uses: actions/upload-artifact@v4
-            with:
-              name: api_test-complete-release
-              path: build_output/*
-              retention-days: 30
+      - name: Upload Complete Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api_test-complete-release
+          path: build_output/*
+          retention-days: 30
