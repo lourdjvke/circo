@@ -43,20 +43,23 @@ jobs:
         run: |
           echo "=========================================="
           echo "LARP Pure Native Android CI/CD Pipeline"
-          echo "App: Strava (com.larp.strava)"
+          echo "App: Amify (com.larp.amu)"
           echo "Target SDK: 34 (Android 14+ Ready)"
           echo "=========================================="
 
           WORK_DIR="build_workspace"
           GEN_DIR="$WORK_DIR/gen"
           BIN_DIR="$WORK_DIR/bin"
-          SRC_DIR="$WORK_DIR/src/com/larp/strava"
+          SRC_DIR="$WORK_DIR/src/com/larp/amu"
           RES_DIR="$WORK_DIR/res"
           DRAWABLE_DIR="$RES_DIR/drawable"
           VALUES_DIR="$RES_DIR/values"
           ASSETS_DIR="$WORK_DIR/assets"
 
           mkdir -p "$GEN_DIR" "$BIN_DIR" "$SRC_DIR" "$DRAWABLE_DIR" "$VALUES_DIR" "$ASSETS_DIR/public"
+
+          # 0. Materialize every uploaded launcher icon sent in iconVariants.
+          printf '%s' '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' | base64 --decode > "$DRAWABLE_DIR/ic_launcher_default.png"
 
           # 1. Copy web static files to assets/public
           if [ -d "public" ]; then
@@ -68,18 +71,18 @@ jobs:
 
           # 2. Write Android resources (strings.xml, colors.xml, styles.xml)
           cat << 'EOF' > "$VALUES_DIR/strings.xml"
-          <resources><string name="app_name">Strava</string></resources>
+          <resources><string name="app_name">Amify</string></resources>
           EOF
 
           cat << 'EOF' > "$VALUES_DIR/colors.xml"
-          <resources><color name="colorPrimary">#ffffff</color></resources>
+          <resources><color name="colorPrimary">#D97757</color></resources>
           EOF
 
           cat << 'EOF' > "$VALUES_DIR/styles.xml"
           <resources>
               <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:statusBarColor">#ffffff</item>
-                  <item name="android:navigationBarColor">#ffffff</item>
+                  <item name="android:statusBarColor">#D97757</item>
+                  <item name="android:navigationBarColor">#D97757</item>
                   <item name="android:windowDrawsSystemBarBackgrounds">true</item>
               </style>
           </resources>
@@ -89,7 +92,7 @@ jobs:
           cat << 'EOF' > "$WORK_DIR/AndroidManifest.xml"
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-              package="com.larp.strava"
+              package="com.larp.amu"
               android:versionCode="101"
               android:versionName="1.0.0">
 
@@ -113,14 +116,15 @@ jobs:
               <uses-permission android:name="android.permission.WAKE_LOCK" />
 
               <application
-                  android:label="Strava"
+                  android:label="Amify"
                   android:theme="@style/AppTheme"
                   android:hardwareAccelerated="true"
-                  android:allowBackup="true">
+                  android:allowBackup="true"
+                  android:icon="@drawable/ic_launcher_default">
 
                   <activity
-                      android:name="com.larp.strava.MainActivity"
-                      android:label="Strava"
+                      android:name="com.larp.amu.MainActivity"
+                      android:label="Amify"
                       android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
                       android:exported="true"
                       android:launchMode="singleTask">
@@ -130,9 +134,9 @@ jobs:
                   </activity>
 
                   <activity-alias
-                      android:name="com.larp.strava.MainActivity_default"
-                      android:targetActivity="com.larp.strava.MainActivity"
-                      android:label="Strava"
+                      android:name="com.larp.amu.MainActivity_default"
+                      android:targetActivity="com.larp.amu.MainActivity"
+                      android:label="Amify"
                       android:enabled="true"
                       android:exported="true">
                       <intent-filter>
@@ -147,7 +151,7 @@ jobs:
 
           # 4. Write MainActivity.java
           cat << 'EOF' > "$SRC_DIR/MainActivity.java"
-          package com.larp.strava;
+          package com.larp.amu;
           import android.app.Activity;
           import android.os.Build;
           import android.os.Bundle;
@@ -172,7 +176,7 @@ jobs:
               private WebView webView;
               private View splashView;
               private Handler mainHandler;
-              private static final String DEFAULT_THEME_COLOR = "#ffffff";
+              private static final String DEFAULT_THEME_COLOR = "#D97757";
 
               @Override
               protected void onCreate(Bundle savedInstanceState) {
@@ -302,7 +306,7 @@ jobs:
           echo "Using android.jar: $ANDROID_JAR"
 
           aapt package -m -J "$GEN_DIR" -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34
-          javac -cp "$ANDROID_JAR" -d "$BIN_DIR" -source 8 -target 8 "$GEN_DIR/com/larp/strava/R.java" "$SRC_DIR/MainActivity.java"
+          javac -cp "$ANDROID_JAR" -d "$BIN_DIR" -source 8 -target 8 "$GEN_DIR/com/larp/amu/R.java" "$SRC_DIR/MainActivity.java"
           dx --dex --output="$WORK_DIR/classes.dex" "$BIN_DIR"
 
           aapt package -f -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -A "$ASSETS_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34 -F "$WORK_DIR/unsigned.apk"
@@ -310,21 +314,27 @@ jobs:
 
           zipalign -f -p 4 "$WORK_DIR/unsigned.apk" "$WORK_DIR/aligned.apk"
 
-          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=Strava, OU=LARP, O=LARP Engineering, C=US"
+          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=Amify, OU=LARP, O=LARP Engineering, C=US"
 
           apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --ks release.keystore --ks-pass pass:larp_keystore_password_2026 --ks-key-alias larp_release --out signed_release.apk "$WORK_DIR/aligned.apk"
 
           mkdir -p build_output
-          cp signed_release.apk build_output/strava_signed_release.apk
-          cp signed_release.apk build_output/strava_signed_release.apk
+          cp signed_release.apk build_output/amify_signed_release.apk
           cp release.keystore build_output/larp_release.keystore
+          cp "$WORK_DIR/AndroidManifest.xml" build_output/AndroidManifest.xml
+          cp -r "$WORK_DIR/src" build_output/source
+          cp -r "$WORK_DIR/assets" build_output/assets
+          cp -r "$WORK_DIR/res" build_output/res
+          printf '%s
+' '{"appName":"Amify","appId":"com.larp.amu","version":"1.0.0","versionCode":101}' > build_output/build-metadata.json
+          (cd build_output && zip -r "amify_github_complete.zip" .)
 
           echo "Build artifacts generated successfully!"
           ls -lh build_output/
 
-      - name: Upload Build Artifacts (APK, Keystore)
-        uses: actions/upload-artifact@v4
-        with:
-          name: lionel-release
-          path: build_output/*
-          retention-days: 30
+          - name: Upload Complete Build Artifacts
+            uses: actions/upload-artifact@v4
+            with:
+              name: amify-complete-release
+              path: build_output/*
+              retention-days: 30
