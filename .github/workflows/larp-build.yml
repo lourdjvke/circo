@@ -335,6 +335,7 @@ jobs:
 
           "$AAPT" package -m -J "$GEN_DIR" -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34
           javac -cp "$ANDROID_JAR" -d "$BIN_DIR" -source 8 -target 8 "$GEN_DIR/com/larp/apitest/R.java" "$SRC_DIR/MainActivity.java"
+          mkdir -p "$WORK_DIR/dex"
           "$D8" --min-api 21 --output "$WORK_DIR/dex" "$BIN_DIR"
           cp "$WORK_DIR/dex/classes.dex" "$WORK_DIR/classes.dex"
 
